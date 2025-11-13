@@ -79,18 +79,32 @@ def get_weather_data(zipcode):
         }
 
 def get_crime_data(origin_zip, destination_zip):
-   coords = zip_to_coords(origin_zip)
+    url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
 
-   if coords is None:
-      print("Error finding coordinates for zip code")
-      return {
-        "incidents": 0,
-        "high_risk_area": False
-      }
-   
-    lat, lon = coords
-   
-   url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
+    params = {
+        "zip_code": origin_zip,
+        "$limit": 50  
+    }
+
+    try:
+        response = requests.get(url, params=params)
+        data = response.json()
+
+        incidents = len(data)
+
+        high_risk_area = incidents >= 20
+
+        return {
+            "incidents": incidents,
+            "high_risk_area": high_risk_area
+        }
+
+    except:
+        return {
+            "incidents": 5,
+            "high_risk_area": False
+        }
+
 
 def get_transit_data(origin, destination):
   # Placeholder for transit data retrieval logic
