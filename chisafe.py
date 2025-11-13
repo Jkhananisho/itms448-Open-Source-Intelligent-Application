@@ -42,14 +42,33 @@ def get_weather_data(zipcode):
         data = response.json()
 
         temperature = data["current_weather"]["temperature"]
-        windspeed = data["current_weather"]["windspeed"]
+        weather_code = data["current_weather"]["weathercode"]
 
-        if windspeed > 20:
-            condition = "Windy"
-        else:
-            condition = "Normal"
+        # SIMPLE mapping from Open-Meteo codes → human words
+        condition_map = {
+            0: "Clear",
+            1: "Mainly Clear",
+            2: "Partly Cloudy",
+            3: "Overcast",
+            45: "Fog",
+            48: "Depositing Rime Fog",
+            51: "Light Drizzle",
+            53: "Moderate Drizzle",
+            55: "Dense Drizzle",
+            61: "Light Rain",
+            63: "Moderate Rain",
+            65: "Heavy Rain",
+            71: "Light Snow",
+            73: "Moderate Snow",
+            75: "Heavy Snow",
+            80: "Rain Showers",
+            81: "Heavy Rain Showers",
+            95: "Thunderstorm"
+        }
 
-        alert = windspeed > 30 or temperature < 0
+        condition = condition_map.get(weather_code, "Unknown")
+
+        alert = weather_code >= 61 or weather_code == 95
 
         return {
             "condition": condition,
@@ -67,7 +86,7 @@ def get_weather_data(zipcode):
 
 
 def get_crime_data(origin_zip, destination_zip):
-    url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
+    url = "https://data.cityofchicago.org/api/v3/views/ijzp-q8t2/query.json"
 
     params = {
         "zip_code": origin_zip,
@@ -115,7 +134,7 @@ def calculate_risk_score(weather, crime, transit, route):
   score = 100
 
   #crime
-  score -= crime["incidents"] * 5
+  score -= crime["incidents"] * 2
   if crime["high_risk_area"]:
     score -= 20
 
@@ -136,6 +155,14 @@ def calculate_risk_score(weather, crime, transit, route):
     score = 100
   return score
 
+def get_risk_label(score):
+    if score < 40:
+        return "High Risk"
+    elif score < 70:
+        return "Moderate Risk"
+    else:
+        return "Safer Route"
+
 def main():
 
   origin_zip, destination_zip = get_user_input()
@@ -147,19 +174,22 @@ def main():
 
   #calculate risk score
   risk_score = calculate_risk_score(weather, crime, transit, route)
+  risk_label = get_risk_label(risk_score)
+
 
   #display results
-  print("Route Summary")
+  print("\n=== Route Summary ===")
   print(f"From ZIP: {origin_zip}  To ZIP: {destination_zip}")
   print(f"Route: {route['route_name']}, Distance: {route['distance_mi']} mi, Estimated Time: {route['estimated_time_min']} min")
 
-  print("data used")
+  print("\n=== Data Used ===")
   temp_f = weather["temperature"] * 9/5 + 32
   print(f"Weather: {weather['condition']}, Temp: {temp_f:.1f}°F, Alert: {weather['alert']}")
   print(f"Crime Incidents: {crime['incidents']}, High Risk Area: {crime['high_risk_area']}")
   print(f"Transit Delays: {transit['delays_minutes']} min, Service Alerts: {transit['service_alerts']}")
 
-  print(f"Overall Risk Score: {risk_score}/100")
+  print("\n=== Risk Score ===")
+  print(f"Overall Risk Score: {risk_score}/100 ({risk_label})")
 
 if __name__ == "__main__":
   main()
