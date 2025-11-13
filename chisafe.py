@@ -1,17 +1,83 @@
-def get_user_input():
-  print("ChiSafe Commute")
-  origin = input("Enter your origin: ")
-  destination = input("Enter your destination: ")
-  return origin, destination
+import requests
 
-def get_weather_data(origin, destination):
-  # Placeholder for weather data retrieval logic
-  weather_data = {
-     "condition": "Sunny",
-     "temperature": 75,
-     "alert": False 
-  }
-  return weather_data
+def get_user_input():
+    print("ChiSafe Commute")
+    origin_zip = input("Enter your origin ZIP code: ")
+    destination_zip = input("Enter your destination ZIP code: ")
+    return origin_zip, destination_zip
+
+def zip_to_coords(zipcode):
+    try:
+        url = f"https://api.zippopotam.us/us/{zipcode}"
+        response = requests.get(url)
+
+        if response.status_code != 200:
+            return None  
+
+        data = response.json()
+        lat = float(data["places"][0]["latitude"])
+        lon = float(data["places"][0]["longitude"])
+        return lat, lon
+
+    except:
+        return None
+
+def get_weather_data(zipcode):
+    coords = zip_to_coords(zipcode)
+
+    if coords is None:
+        print("Error finding coordinates for zip code")
+        return {
+            "condition": "Unknown",
+            "temperature": 70,
+            "alert": False
+        }
+
+    lat, lon = coords
+
+    url = (
+        f"https://api.open-meteo.com/v1/forecast?"
+        f"latitude={lat}&longitude={lon}&current_weather=true"
+    )
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+
+        weather = data["current_weather"]
+        temperature = weather["temperature"]
+        conditions = weather["weathercode"]
+
+        condition_map = {
+            0: "Clear",
+            1: "Mainly Clear",
+            2: "Partly Cloudy",
+            3: "Overcast",
+            45: "Fog",
+            48: "Rime Fog",
+            51: "Light Drizzle",
+            61: "Rain",
+            80: "Rain Showers",
+            95: "Thunderstorm"
+        }
+
+        condition_text = condition_map.get(conditions, "Unknown")
+
+        return {
+            "condition": condition_text,
+            "temperature": temperature,
+            "alert": conditions >= 80
+        }
+
+    except Exception as e:
+        print("error with api")
+        print("Error:", e)
+        return {
+            "condition": "Unknown",
+            "temperature": 70,
+            "alert": False
+        }
+
 
 def get_crime_data(origin, destination):
   # Placeholder for crime data retrieval logic
@@ -64,25 +130,25 @@ def calculate_risk_score(weather, crime, transit, route):
   return score
 
 def main():
-  # Get user input
-  origin, destination = get_user_input()
 
-  #get data from source
-  weather = get_weather_data(origin, destination)
-  crime = get_crime_data(origin, destination)
-  transit = get_transit_data(origin, destination)
-  route = get_route_options(origin, destination)
+  origin_zip, destination_zip = get_user_input()
+
+  weather = get_weather_data(origin_zip)
+  crime = get_crime_data(origin_zip, destination_zip)
+  transit = get_transit_data(origin_zip, destination_zip)
+  route = get_route_options(origin_zip, destination_zip)
 
   #calculate risk score
   risk_score = calculate_risk_score(weather, crime, transit, route)
 
   #display results
   print("Route Summary")
-  print(f"From: {origin} To: {destination}")
+  print(f"From ZIP: {origin_zip}  To ZIP: {destination_zip}")
   print(f"Route: {route['route_name']}, Distance: {route['distance_mi']} mi, Estimated Time: {route['estimated_time_min']} min")
 
   print("data used")
-  print(f"Weather: {weather['condition']}, Temp: {weather['temperature']}, Alert: {weather['alert']}")
+  temp_f = weather["temperature"] * 9/5 + 32
+  print(f"Weather: {weather['condition']}, Temp: {temp_f:.1f}°F, Alert: {weather['alert']}")
   print(f"Crime Incidents: {crime['incidents']}, High Risk Area: {crime['high_risk_area']}")
   print(f"Transit Delays: {transit['delays_minutes']} min, Service Alerts: {transit['service_alerts']}")
 
