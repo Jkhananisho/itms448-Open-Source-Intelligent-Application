@@ -37,3 +37,28 @@ def get_route_options(origin, destination):
     "estimated_time_min": 25
   }
   return route
+
+def calculate_risk_score(weather, crime, transit, route):
+  score = 100
+
+  #crime
+  score -= crime["incidents"] * 5
+  if crime["high_risk_area"]:
+    score -= 20
+
+  #weather
+  if weather["alert"]:
+    score -= 25
+  if weather["temperature"] <= -5:
+    score -= 15
+
+  #transit
+  score -= transit["delays_minutes"] // 5 * 3
+  if transit["service_alerts"]:
+    score -= 15
+  
+  if score < 0:
+    score = 0
+  if score > 100:
+    score = 100
+  return score
