@@ -62,3 +62,31 @@ def calculate_risk_score(weather, crime, transit, route):
   if score > 100:
     score = 100
   return score
+
+def main():
+  # Get user input
+  origin, destination = get_user_input()
+
+  #get data from source
+  weather = get_weather_data(origin, destination)
+  crime = get_crime_data(origin, destination)
+  transit = get_transit_data(origin, destination)
+  route = get_route_options(origin, destination)
+
+  #calculate risk score
+  risk_score = calculate_risk_score(weather, crime, transit, route)
+
+  #display results
+  print("Route Summary")
+  print(f"From: {origin} To: {destination}")
+  print(f"Route: {route['route_name']}, Distance: {route['distance_mi']} mi, Estimated Time: {route['estimated_time_min']} min")
+
+  print("data used")
+  print(f"Weather: {weather['condition']}, Temp: {weather['temperature']}, Alert: {weather['alert']}")
+  print(f"Crime Incidents: {crime['incidents']}, High Risk Area: {crime['high_risk_area']}")
+  print(f"Transit Delays: {transit['delays_minutes']} min, Service Alerts: {transit['service_alerts']}")
+
+  print(f"Overall Risk Score: {risk_score}/100")
+
+if __name__ == "__main__":
+  main()
