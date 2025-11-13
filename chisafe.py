@@ -8,7 +8,7 @@ def get_weather_data(origin, destination):
   # Placeholder for weather data retrieval logic
   weather_data = {
      "condition": "Sunny",
-     "temperature": "75°F",
+     "temperature": 75,
      "alert": False 
   }
   return weather_data
