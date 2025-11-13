@@ -78,14 +78,19 @@ def get_weather_data(zipcode):
             "alert": False
         }
 
+def get_crime_data(origin_zip, destination_zip):
+   coords = zip_to_coords(origin_zip)
 
-def get_crime_data(origin, destination):
-  # Placeholder for crime data retrieval logic
-  crime_data = {
-    "incidents": 5,
-    "high_risk_area": False
-  }
-  return crime_data
+   if coords is None:
+      print("Error finding coordinates for zip code")
+      return {
+        "incidents": 0,
+        "high_risk_area": False
+      }
+   
+    lat, lon = coords
+   
+   url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
 
 def get_transit_data(origin, destination):
   # Placeholder for transit data retrieval logic
