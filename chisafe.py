@@ -1,5 +1,4 @@
 import requests
-import secrets
 from transit import get_transit_data
 
 
@@ -166,7 +165,6 @@ def main():
 
   weather = get_weather_data(origin_zip)
   crime = get_crime_data(origin_zip, destination_zip)
-  transit = get_transit_data(origin_zip, destination_zip)
   route = get_route_options(origin_zip, destination_zip)
 
   #calculate risk score

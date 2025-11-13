@@ -1,5 +1,7 @@
 import requests
 from secrets import CTA_TRAIN_API_KEY
+from secrets import CTA_BUS_API_KEY
+
 
 def get_transit_data(station_id):
 
@@ -37,3 +39,34 @@ def get_transit_data(station_id):
         "delays_minutes": 0,
         "service_alerts": 0
     }
+  
+def get_bus_data(route, stop_id):
+  try:
+      url = (
+        "http://ctabustracker.com/bustime/api/v2/getpredictions"
+        f"?key={CTA_BUS_API_KEY}&rt={route}&stpid={stop_id}&format=json"
+    )
+      
+      response = requests.get(url)
+
+      if response.status_code != 200:
+          return {"bus_delay": 0}
+      
+      data = response.json()
+      predictions = data.get("bustime-response", {}).get("prd", [])
+
+      if not predictions:
+          return {"bus_delay": 0}
+      
+      delay = 0
+
+      for p in predictions:
+          if p.get("dly") == True:
+              delay += 5
+
+      return {
+          "bus_delay": delay}
+  except:
+      return {
+          "bus_delay": 0}
+        
