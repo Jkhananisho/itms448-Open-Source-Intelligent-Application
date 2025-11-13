@@ -1,4 +1,6 @@
 import requests
+import secrets
+
 
 def get_user_input():
     print("ChiSafe Commute")
@@ -44,7 +46,6 @@ def get_weather_data(zipcode):
         temperature = data["current_weather"]["temperature"]
         weather_code = data["current_weather"]["weathercode"]
 
-        # SIMPLE mapping from Open-Meteo codes → human words
         condition_map = {
             0: "Clear",
             1: "Mainly Clear",
