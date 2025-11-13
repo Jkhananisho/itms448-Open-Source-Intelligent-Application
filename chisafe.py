@@ -1,5 +1,7 @@
 import requests
 import secrets
+from transit import get_transit_data
+
 
 
 def get_user_input():
@@ -114,14 +116,6 @@ def get_crime_data(origin_zip, destination_zip):
         }
 
 
-def get_transit_data(origin, destination):
-  # Placeholder for transit data retrieval logic
-  transit_data = {
-    "delays_minutes": 0,
-    "service_alerts": False
-  }
-  return transit_data
-
 def get_route_options(origin, destination):
   # Placeholder for route options retrieval logic
   route = {
@@ -167,6 +161,8 @@ def get_risk_label(score):
 def main():
 
   origin_zip, destination_zip = get_user_input()
+  station_id = input("Enter CTA Station ID")
+  transit = get_transit_data(station_id)
 
   weather = get_weather_data(origin_zip)
   crime = get_crime_data(origin_zip, destination_zip)
