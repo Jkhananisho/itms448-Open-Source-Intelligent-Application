@@ -26,7 +26,7 @@ def get_weather_data(zipcode):
     coords = zip_to_coords(zipcode)
 
     if coords is None:
-        print("Error finding coordinates for zip code")
+        print("Using default weather (ZIP lookup failed).")
         return {
             "condition": "Unknown",
             "temperature": 70,
@@ -35,48 +35,36 @@ def get_weather_data(zipcode):
 
     lat, lon = coords
 
-    url = (
-        f"https://api.open-meteo.com/v1/forecast?"
-        f"latitude={lat}&longitude={lon}&current_weather=true"
-    )
+    url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
 
     try:
         response = requests.get(url)
         data = response.json()
 
-        weather = data["current_weather"]
-        temperature = weather["temperature"]
-        conditions = weather["weathercode"]
+        temperature = data["current_weather"]["temperature"]
+        windspeed = data["current_weather"]["windspeed"]
 
-        condition_map = {
-            0: "Clear",
-            1: "Mainly Clear",
-            2: "Partly Cloudy",
-            3: "Overcast",
-            45: "Fog",
-            48: "Rime Fog",
-            51: "Light Drizzle",
-            61: "Rain",
-            80: "Rain Showers",
-            95: "Thunderstorm"
-        }
+        if windspeed > 20:
+            condition = "Windy"
+        else:
+            condition = "Normal"
 
-        condition_text = condition_map.get(conditions, "Unknown")
+        alert = windspeed > 30 or temperature < 0
 
         return {
-            "condition": condition_text,
+            "condition": condition,
             "temperature": temperature,
-            "alert": conditions >= 80
+            "alert": alert
         }
 
-    except Exception as e:
-        print("error with api")
-        print("Error:", e)
+    except:
+        print("Weather API failed. Using fallback.")
         return {
             "condition": "Unknown",
             "temperature": 70,
             "alert": False
         }
+
 
 def get_crime_data(origin_zip, destination_zip):
     url = "https://data.cityofchicago.org/resource/ijzp-q8t2.json"
