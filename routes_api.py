@@ -19,7 +19,7 @@ def get_route_options(origin_zip, destination_zip):
     url = "https://api.geoapify.com/v1/routing"
     params = {
         "waypoints": f"{lat1},{lon1}|{lat2},{lon2}",
-        "mode": "drive",
+        "mode": "transit",
         "format": "json",
         "apiKey": GEOAPIFY_API_KEY
     }
@@ -36,7 +36,7 @@ def get_route_options(origin_zip, destination_zip):
         duration_min = time_seconds / 60
 
         return {
-            "route_name": "Driving Route",
+            "route_name": "Transit Route",
             "distance_mi": round(distance_mi, 1),
             "estimated_time_min": round(duration_min)
         }
