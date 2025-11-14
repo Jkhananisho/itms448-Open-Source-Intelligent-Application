@@ -7,7 +7,7 @@ def get_transit_data(mapid):
 
   url = "https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx"
   params = {
-    "key": CTA_API_KEY,
+    "key": CTA_TRAIN_API_KEY,
     "mapid": mapid,
     "outputType": "JSON"
   }
@@ -18,7 +18,7 @@ def get_transit_data(mapid):
 
     etas = data.get("ctatt", {}).get("eta", [])
     if not etas:
-      return {"delay_minutes": 0, "service_alerts": False}
+      return {"delays_minutes": 0, "service_alerts": False}
     
     waits = []
     delayed = False
@@ -37,14 +37,14 @@ def get_transit_data(mapid):
         delayed = True
 
     return {
-      "delay_minutes": min(waits) if waits else 0,
+      "delays_minutes": min(waits) if waits else 0,
       "service_alerts": delayed
     }
   
   except:
-    return {"delay_minutes": 0, "service_alerts": False}
+    return {"delays_minutes": 0, "service_alerts": False}
   
 def get_bus_data(bus_stop_id):
-  return {"delay_minutes": 0, "service_alerts": False}
+  return {"delays_minutes": 0, "service_alerts": False}
 
   
