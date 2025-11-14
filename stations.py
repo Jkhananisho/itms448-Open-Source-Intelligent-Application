@@ -9,11 +9,12 @@ def load_stations():
     return
   
   try:
-    with open("cta_l_stations.csv", newline='', encoding='utf-8') as csvfile:
+    with open("cta_l_stops.csv", newline='', encoding='utf-8') as csvfile:
+      print("Loaded stations CSV")
       reader = csv.DictReader(csvfile)
       for row in reader:
         try:
-          loc = row["Location"].strip("()").split(",")
+          loc = row["Location"].strip().strip("()")
           lat_str, long_str = loc.split(",")
 
           station = {
@@ -32,7 +33,7 @@ def load_stations():
 
 def get_nearest_station(lat, lon):
   if not STATIONS:
-    return None
+    load_stations()
   
   best_station = None
   best_dist = None

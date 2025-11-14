@@ -1,6 +1,5 @@
 import requests
 from secrets import CTA_TRAIN_API_KEY
-from secrets import CTA_BUS_API_KEY
 
 
 def get_transit_data(mapid):
@@ -44,7 +43,8 @@ def get_transit_data(mapid):
   except:
     return {"delays_minutes": 0, "service_alerts": False}
   
-def get_bus_data(bus_stop_id):
-  return {"delays_minutes": 0, "service_alerts": False}
+
+
+  
 
   
