@@ -1,6 +1,5 @@
-from transit import get_transit_data, get_bus_data
+from transit import get_transit_data
 from stations import get_nearest_station
-
 from geo import zip_to_coords
 from weather_api import get_weather_data
 from crime_api import get_crime_data
@@ -28,14 +27,14 @@ def main():
 
   if coords is None:
       station_name = "Unknown"
-      transit = {"delays_minutes": 0, "service_alerts": 0}
+      transit = {"delays_minutes": 0, "service_alerts": False}
   else:
       lat, lon = coords
       station = get_nearest_station(lat, lon)
 
       if station is None:
           station_name = "Unknown"
-          transit = {"delays_minutes": 0, "service_alerts": 0}
+          transit = {"delays_minutes": 0, "service_alerts": False}
       else:
           station_name = station["name"]
           transit = get_transit_data(station["mapid"])
