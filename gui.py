@@ -11,7 +11,7 @@ from risk import calculate_risk_score, get_risk_label
 
 def run_commute():
   origin_zip = origin_entry.get().strip()
-  destination_zip = destination_entry.get().strip()
+  destination_zip = dest_entry.get().strip()
 
   if not (origin_zip.isdigit() and destination_zip.isdigit()):
       messagebox.showerror("error", "enter a real zip man")
@@ -60,3 +60,24 @@ def run_commute():
 
   except Exception as e:
       messagebox.showerror("Error", f"something broke: {e}")
+
+
+# actual gui stuff
+
+root = tk.Tk()
+root.title("ChiSafe Commute")
+
+tk.Label(root, text="Origin ZIP:").pack(pady=(10, 0))
+origin_entry = tk.Entry(root)
+origin_entry.pack(pady=5)
+
+tk.Label(root, text="Destination ZIP:").pack(pady=(10, 0))
+dest_entry = tk.Entry(root)
+dest_entry.pack(pady=5)
+
+tk.Button(root, text="Run Commute Check", command=run_commute).pack(pady=10)
+
+output_box = tk.Text(root, height=20, width=60)
+output_box.pack(pady=10)
+
+root.mainloop()
