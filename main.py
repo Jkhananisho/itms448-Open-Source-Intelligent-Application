@@ -24,8 +24,6 @@ def main():
 
   #finds the nearest station based on the orgin provided 
   coords = zip_to_coords(origin_zip)
-  print("DEBUG coords:", coords)
-
 
   if coords is None:
       station_name = "Unknown"

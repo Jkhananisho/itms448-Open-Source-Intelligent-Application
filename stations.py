@@ -10,7 +10,6 @@ def load_stations():
   
   try:
     with open("cta_l_stops.csv", newline='', encoding='utf-8') as csvfile:
-      print("Loaded stations CSV")
       reader = csv.DictReader(csvfile)
       for row in reader:
         try:
