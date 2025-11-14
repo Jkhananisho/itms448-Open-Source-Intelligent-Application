@@ -20,22 +20,20 @@ def get_route_options(origin_zip, destination_zip):
     params = {
         "waypoints": f"{lat1},{lon1}|{lat2},{lon2}",
         "mode": "drive",
+        "format": "json",
         "apiKey": GEOAPIFY_API_KEY
     }
 
-    try: 
+    try:
         response = requests.get(url, params=params)
         data = response.json()
 
-        feature = data["features"][0]
-        props = feature["properties"]
-        summary = props["summary"]
+        route = data["results"][0]
+        distance = route["distance"]
+        time_seconds = route["time"]
 
-        distance_m = summary["distance"]
-        duration_s = summary["duration"]
-
-        distance_mi = distance_m * 0.000621371
-        duration_min = duration_s / 60
+        distance_mi = distance * 0.000621371
+        duration_min = time_seconds / 60
 
         return {
             "route_name": "Driving Route",
@@ -43,7 +41,7 @@ def get_route_options(origin_zip, destination_zip):
             "estimated_time_min": round(duration_min)
         }
     
-    except:
+    except Exception as e:
         return {
             "route_name": "Unknown",
             "distance_mi": 0,
