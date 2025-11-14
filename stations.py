@@ -1,12 +1,34 @@
+import csv
 
-STATIONS = [
-  {
-    "name": "Clark/Lake",
-    "lat": 41.885737,
-    "lon": -87.631262,
-    "mapid": 40380
-  }
-]
+
+STATIONS = []
+
+def load_stations():
+  global STATIONS
+  if STATIONS:
+    return
+  
+  try:
+    with open("cta_l_stations.csv", newline='', encoding='utf-8') as csvfile:
+      reader = csv.DictReader(csvfile)
+      for row in reader:
+        try:
+          loc = row["Location"].strip("()").split(",")
+          lat_str, long_str = loc.split(",")
+
+          station = {
+            "name": row["STATION_NAME"],
+            "lat": float(lat_str),
+            "lon": float(long_str),
+            "mapid": int(row["MAP_ID"])
+          }
+          STATIONS.append(station)
+        except Exception:
+          continue
+  except FileNotFoundError:
+    print("no file found for csv stations")
+
+
 
 def get_nearest_station(lat, lon):
   if not STATIONS:
