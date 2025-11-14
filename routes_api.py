@@ -3,7 +3,7 @@ from secrets import GEOAPIFY_API_KEY
 from geo import zip_to_coords
 
 def get_route_options(origin_zip, destination_zip):
-    origin_coords = zip_to_coords
+    origin_coords = zip_to_coords(origin_zip)
     dest_coords = zip_to_coords(destination_zip)
 
     if origin_coords is None or dest_coords is None:
