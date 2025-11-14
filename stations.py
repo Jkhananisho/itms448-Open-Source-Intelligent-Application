@@ -38,13 +38,12 @@ def get_nearest_station(lat, lon):
   best_dist = None
 
   for station in STATIONS:
-    s_lat = station["lat"]
-    s_lon = station["lon"]
+    dx = lat - station["lat"]
+    dy = lon - station["lon"]
+    dist = dx * dx + dy * dy
 
-    d = (lat - s_lat) ** 2 + (lon - s_lon) ** 2
+    if best_dist is None or dist < best_dist:
+      best_dist = dist
+      closest = station
 
-    if best_dist is None or d < best_dist:
-      best_dist = d
-      best_station = station
-
-  return best_station
+  return closest
